@@ -6,6 +6,32 @@ The system was evaluated using synthetic ship telemetry datasets with temporal c
 
 Through this project, I gained practical experience in edge computing, multivariate statistical process control, statistical change detection, object-oriented software design, data processing, and algorithmic implementation for resource-constrained environments.
 
+## Results
+
+The method was evaluated on synthetic multivariate streams (AR(1) model) generated from real sensor data of a container ship, across 120 configurations: decision interval *h* = 6–9 (allowance *k* = 1.0) and *h* = 10–15 (*k* = 0.5), buffer sizes 50 / 100 / 150 / 200, and three replacement strategies.
+
+Data reduction is measured with the compression ratio **C = 1 − M/N**, where *N* is the number of measurements in the original stream and *M* the number of measurements sent to the cloud.
+
+| Configuration | Compression ratio C | Data reduction |
+|---|---|---|
+| All configurations (range) | 0.548 – 0.909 | 55% – 91% |
+| Buffer size 100 (balanced choice when compression is the priority) | 0.813 (mean) | ~81% |
+| *h* = 9, *k* = 1.0 (best overall configuration) | 0.887 (mean) | ~89% |
+| *h* = 9, *k* = 1.0, buffer 50 (maximum) | 0.909 | ~91% |
+
+**Key findings**
+
+- Increasing *h* makes Vector CUSUM less sensitive, producing fewer epochs and higher compression, with diminishing returns at larger values.
+- Compression depends only on the CUSUM parameters and the buffer size, not on the replacement strategy.
+- *h* = 9, *k* = 1.0 achieved the highest compression, the best change-detection score (PATE-F1) and the best composite scores.
+- **Mahalanobis Range Replacement** preserved the multivariate data envelope best (highest volume and generalized-variance indices) and led all composite scores (SQ, SE, TP) in every configuration, because Mahalanobis distance accounts for correlations and different measurement scales between variables.
+- A buffer of 200 gave the best average overall performance; a buffer of 100 is the more balanced choice when compression matters most, with lower variance in performance.
+
+### Limitations
+
+- The evaluation used synthetic data; validation on real, raw ship telemetry is future work.
+- The CUSUM parameters (*h*, *k*) are fixed for each stream; adapting them dynamically is a possible extension.
+
 ## Repository Layout
 
 * 01_mcusum_core/: Core implementation of the data buffer, Vector CUSUM, and replacement strategies.
